@@ -1,0 +1,66 @@
+% Author: Popov Dmitry & Dmitrienko Margarita
+% Innopolis University
+% Advanced Robotic Manipulation
+% Homework 4
+%
+% Calculate robot end-effector displacement
+%
+% Using:
+% showDef_lin(F);
+% Input: F - force vector (Fx,Fy,Fz,Mx,My,Mz) example: F = [100;00;0;0;0;0];
+% Output: none 
+
+% function showDef_lin(F)
+F=[100 0 0 0 0 0];
+x = -200:10:200;
+y = -200:10:200;
+z = -200:10:200;
+z1 = zeros(length(x),length(y), length(z));
+z2 = zeros(length(x),length(y));
+z3 = zeros(length(x),length(y));
+z4 = zeros(length(x),length(y));
+
+
+for i = 1:length(x)
+%     disp(i/length(x)*100)
+    for j = 1:length(y)
+        % Calc robot stiffnes matrix
+        for k= 1: length(z)
+            K =VJM_lin_total(x(i)/1000, y(j)/1000,z(k)/1000);
+            % Get deflections for all configurations
+            dt=F*K;
+            dr=sqrt(dt(1)^2+dt(2)^2+ dt(3)^2);
+            z1(i,j,k) = dr;
+        end
+%         dt=K2*F;
+%         dr=sqrt(dt(1)^2+dt(2)^2);
+%         z2(i,j) = dr;
+%         dt=K3*F;
+%         dr=sqrt(dt(1)^2+dt(2)^2);
+%         z3(i,j) = dr;
+%         dt=K4*F;
+%         dr=sqrt(dt(1)^2+dt(2)^2);
+%         z4(i,j) = dr;
+    end    
+end
+R = [linspace(0,1,100) ones(1,43) linspace(1,1,100)];
+G = [linspace(0,1,100) ones(1,43) linspace(1,0,100)]; 
+B = [linspace(1,1,100) ones(1,43) linspace(1,0,100)]; 
+cmap = [R(:),G(:),B(:)];
+% daspect([1 1 1])
+% colormap(cmap)
+% caxis([-10 10])
+% colorbar
+img = peaks(50);
+figure()
+for kk=1: length(z1)
+    img = peaks(128);
+%     contour(img,128)
+    [M,c]=contour3(z1(:,:,kk),128);
+    c.LineWidth=0.5;
+%     daspect([1 1 1])
+    colormap(hot)%     caxis([-10 10 10])
+    colorbar
+    hold on
+end
+
